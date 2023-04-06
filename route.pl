@@ -112,11 +112,38 @@ cost(9, 3, 16).
 cost(9, 2, 16).
 cost(9, 1, 15).
 
+costs(Route, T) :-
+    length(Route, L), L #= 1, !,
+    [A|_] = Route,
+    leg(Z, ziel),
+    cost(A, Z, T).
+
+% TODO this
+% costs(Route, T) :-
+%     length(Route, L), L #= 9,
+%     [A|Rest] = Route,
+%     leg(S, start),
+%     cost(S, A, C),
+%     append([A], Rest, New),
+%     costs(New, E),
+%     T is C + E.
+
+costs(Route, T) :-
+    length(Route, L), L #> 1, !,
+    [A, B|Rest] = Route,
+    % calculate E recursively ...
+    cost(A, B, C),
+    append([B], Rest, New),
+    costs(New, E),
+    T is C + E.
+
+% use with `label/1'
 make_row(Cols) :-
     length(Cols, L), L #= 9,
     Cols ins 1..9,
     all_distinct(Cols).
 
+% maplist(label, X), maplist(portray_clause, X).
 make_matrix(Rows) :-
     length(Rows, L), L #= 9,
     maplist(make_row, Rows),
