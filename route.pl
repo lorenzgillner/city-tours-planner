@@ -149,3 +149,6 @@ make_matrix(Rows) :-
     maplist(make_row, Rows),
     transpose(Rows, Cols),
     maplist(all_distinct, Cols).
+
+% make_matrix(X), maplist(label, X), maplist(costs, X, Z).
+% all Zs have to be equal.
