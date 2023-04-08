@@ -114,35 +114,30 @@ cost(9, 3, 16).
 cost(9, 2, 16).
 cost(9, 1, 15).
 
-stop(15).
+stop(10).
 
 costs(Route, T) :-
     length(Route, L), L #= 1, !,
     [A|_] = Route,
-    leg(Z, ziel),
-    cost(A, Z, C),
+    leg(Ziel, ziel),
+    cost(A, Ziel, C),
     stop(Y),
     T is C + Y.
-
-% TODO this
-% costs(Route, T) :-
-%     length(Route, L), L #= 9,
-%     [A|Rest] = Route,
-%     leg(S, start),
-%     cost(S, A, C),
-%     append([A], Rest, New),
-%     costs(New, E),
-%     T is C + E.
 
 costs(Route, T) :-
     length(Route, L), L #> 1, !,
     [A, B|Rest] = Route,
-    % calculate E recursively ...
     cost(A, B, C),
     append([B], Rest, New),
     costs(New, E),
     stop(Y),
-    T is C + E + Y.
+    (
+        L == 9 ->
+        leg(Start, start),
+        cost(Start, A, S),
+        T is C + E + Y + S;
+        T is C + E + Y
+    ).
 
 % use with `label/1'
 make_row(Cols) :-
@@ -157,15 +152,11 @@ make_matrix(Rows) :-
     transpose(Rows, Cols),
     maplist(all_distinct, Cols).
 
-make_routes(Routes, Costs) :-
+make_routes(Routes, Costs, Delta) :-
     make_matrix(Routes),
     maplist(label, Routes),
-    leg(Z, ziel),
-    maplist(portray_clause, Routes).
-    % maplist(costs, Routes, Costs).
-    % max_list(Costs, Max),
-    % min_list(Costs, Min),
-    % Max #= Min + 1.
-
-% make_matrix(X), maplist(label, X), maplist(costs, X, Z).
-% all Zs have to be equal.
+    % maplist(portray_clause, Routes),
+    maplist(costs, Routes, Costs),
+    max_list(Costs, Max),
+    min_list(Costs, Min),
+    Max #=< Min + Delta.
