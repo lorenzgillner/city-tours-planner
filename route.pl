@@ -145,18 +145,21 @@ make_row(Cols) :-
     Cols ins 1..9,
     all_distinct(Cols).
 
-% maplist(label, X), maplist(portray_clause, X).
 make_matrix(Rows) :-
     length(Rows, L), L #= 9,
     maplist(make_row, Rows),
     transpose(Rows, Cols),
     maplist(all_distinct, Cols).
 
+overlaps(RouteA, RouteB) :-
+    length(RouteA, L1), length(RouteB, L2), L1 #= L2.
+
 make_routes(Routes, Costs, Delta) :-
     make_matrix(Routes),
     maplist(label, Routes),
-    % maplist(portray_clause, Routes),
     maplist(costs, Routes, Costs),
     max_list(Costs, Max),
     min_list(Costs, Min),
     Max #=< Min + Delta.
+
+% maplist(portray_clause, Routes).
