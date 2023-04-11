@@ -166,6 +166,16 @@ make_routes(Routes, Costs, Delta) :-
     maplist(costs, Routes, Costs),
     max_list(Costs, Max),
     min_list(Costs, Min),
-    Max #=< Min + Delta.
+    Max #=< Min + Delta,
+    [R1, R2, R3, R4, R5, R6, R7, R8, R9|_] = Routes,
+    select(R1, Routes, T1), rotate(left, R1, RR1), maplist(\+overlap, T1, RR1)
+    select(R2, Routes, T2), rotate(left, R2, RR2), maplist(\+overlap, T2, RR2)
+    select(R3, Routes, T3), rotate(left, R3, RR3), maplist(\+overlap, T3, RR3)
+    select(R4, Routes, T4), rotate(left, R4, RR4), maplist(\+overlap, T4, RR4)
+    select(R5, Routes, T5), rotate(left, R5, RR5), maplist(\+overlap, T5, RR5)
+    select(R6, Routes, T6), rotate(left, R6, RR6), maplist(\+overlap, T6, RR6)
+    select(R7, Routes, T7), rotate(left, R7, RR7), maplist(\+overlap, T7, RR7)
+    select(R8, Routes, T8), rotate(left, R8, RR8), maplist(\+overlap, T8, RR8)
+    select(R9, Routes, T9), rotate(left, R9, RR9), maplist(\+overlap, T9, RR9).
 
 % maplist(portray_clause, Routes).
