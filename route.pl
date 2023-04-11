@@ -116,6 +116,15 @@ cost(9, 1, 15).
 
 stop(10).
 
+% https://stackoverflow.com/a/33987713
+rotate(right, L, [T|H]) :- append(H, [T], L).
+rotate(left, [H|T], L) :- append(T, [H], L).
+
+% https://stackoverflow.com/a/49503900
+product(A, B, C) :- findall([X,Y],(member(X,A),member(Y,B)),C).
+
+overlap([H1|T1], [H2|T2]) :- overlap(T1, T2), !; H1 == H2.
+
 costs(Route, T) :-
     length(Route, L), L #= 1, !,
     [A|_] = Route,
@@ -150,9 +159,6 @@ make_matrix(Rows) :-
     maplist(make_row, Rows),
     transpose(Rows, Cols),
     maplist(all_distinct, Cols).
-
-overlaps(RouteA, RouteB) :-
-    length(RouteA, L1), length(RouteB, L2), L1 #= L2.
 
 make_routes(Routes, Costs, Delta) :-
     make_matrix(Routes),
