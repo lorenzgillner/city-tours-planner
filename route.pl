@@ -108,16 +108,6 @@ cost(9, 1, 15).
 % stay for this long in one place (additional cost)
 stop(10).
 
-% https://stackoverflow.com/a/33987713
-rotate(right, L, [T|H]) :- append(H, [T], L).
-rotate(left, [H|T], L) :- append(T, [H], L).
-
-% https://stackoverflow.com/a/49503900
-product(A, B, C) :- findall([X,Y], (member(X,A), member(Y,B)), C).
-
-% check whether two lists overlap
-overlap([H1|T1], [H2|T2]) :- overlap(T1, T2), !; H1 == H2.
-
 % total costs of Route is T
 costs(Route, T) :-
     length(Route, L), L #= 1, !,
@@ -165,7 +155,3 @@ make_routes(N, Routes, Costs, Delta) :-
     max_list(Costs, Max),
     min_list(Costs, Min),
     Max #=< Min + Delta.
-
-% NOTES
-% -----
-% maplist(portray_clause, Routes)
