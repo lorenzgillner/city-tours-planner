@@ -1,19 +1,10 @@
 % use_module(library(clpfd)).
 
-% "Legende"
-leg(0, start).
-leg(1, lindengarten).
-leg(2, wasserkunst).
-leg(3, rathaus).
-leg(4, kirche).
-leg(5, soko).
-leg(6, brunnen).
-leg(7, schweini).
-leg(8, wassertor).
-leg(9, baumhaus).
-leg(10, ziel).
+% explanations of IDs; those two are the only labels that really matter
+label(0, start).
+label(10, destination).
 
-% start, ziel, minuten
+% source, destination, time to travel from source to destination 
 cost(0, 1, 7).
 cost(0, 2, 2).
 cost(0, 3, 2).
@@ -114,6 +105,7 @@ cost(9, 3, 16).
 cost(9, 2, 16).
 cost(9, 1, 15).
 
+% stay for this long in one place (additional cost)
 stop(10).
 
 % https://stackoverflow.com/a/33987713
@@ -121,15 +113,17 @@ rotate(right, L, [T|H]) :- append(H, [T], L).
 rotate(left, [H|T], L) :- append(T, [H], L).
 
 % https://stackoverflow.com/a/49503900
-product(A, B, C) :- findall([X,Y],(member(X,A),member(Y,B)),C).
+product(A, B, C) :- findall([X,Y], (member(X,A), member(Y,B)), C).
 
+% check whether two lists overlap
 overlap([H1|T1], [H2|T2]) :- overlap(T1, T2), !; H1 == H2.
 
+% total costs of Route is T
 costs(Route, T) :-
     length(Route, L), L #= 1, !,
     [A|_] = Route,
-    leg(Ziel, ziel),
-    cost(A, Ziel, C),
+    label(Z, destination),
+    cost(A, Z, C),
     stop(Y),
     T is C + Y.
 
@@ -142,13 +136,13 @@ costs(Route, T) :-
     stop(Y),
     (
         L == 9 ->
-        leg(Start, start),
+        label(Start, start),
         cost(Start, A, S),
         T is C + E + Y + S;
         T is C + E + Y
     ).
 
-% use with `label/1'
+% use with `label/1`
 make_row(Cols) :-
     length(Cols, L), L #= 9,
     Cols ins 1..9,
@@ -166,16 +160,6 @@ make_routes(Routes, Costs, Delta) :-
     maplist(costs, Routes, Costs),
     max_list(Costs, Max),
     min_list(Costs, Min),
-    Max #=< Min + Delta,
-    [R1, R2, R3, R4, R5, R6, R7, R8, R9|_] = Routes,
-    select(R1, Routes, T1), rotate(left, R1, RR1), maplist(\+overlap, T1, RR1)
-    select(R2, Routes, T2), rotate(left, R2, RR2), maplist(\+overlap, T2, RR2)
-    select(R3, Routes, T3), rotate(left, R3, RR3), maplist(\+overlap, T3, RR3)
-    select(R4, Routes, T4), rotate(left, R4, RR4), maplist(\+overlap, T4, RR4)
-    select(R5, Routes, T5), rotate(left, R5, RR5), maplist(\+overlap, T5, RR5)
-    select(R6, Routes, T6), rotate(left, R6, RR6), maplist(\+overlap, T6, RR6)
-    select(R7, Routes, T7), rotate(left, R7, RR7), maplist(\+overlap, T7, RR7)
-    select(R8, Routes, T8), rotate(left, R8, RR8), maplist(\+overlap, T8, RR8)
-    select(R9, Routes, T9), rotate(left, R9, RR9), maplist(\+overlap, T9, RR9).
+    Max #=< Min + Delta.
 
 % maplist(portray_clause, Routes).
