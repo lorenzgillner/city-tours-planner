@@ -1,8 +1,8 @@
-% use_module(library(clpfd)).
+?-use_module(library(clpfd)).
 
 % explanations of IDs; those two are the only labels that really matter
-label(0, start).
-label(10, destination).
+legend(0, start).
+legend(10, destination).
 
 % source, destination, time to travel from source to destination 
 cost(0, 1, 7).
@@ -122,7 +122,7 @@ overlap([H1|T1], [H2|T2]) :- overlap(T1, T2), !; H1 == H2.
 costs(Route, T) :-
     length(Route, L), L #= 1, !,
     [A|_] = Route,
-    label(Z, destination),
+    legend(Z, destination),
     cost(A, Z, C),
     stop(Y),
     T is C + Y.
@@ -136,30 +136,36 @@ costs(Route, T) :-
     stop(Y),
     (
         L == 9 ->
-        label(Start, start),
+        legend(Start, start),
         cost(Start, A, S),
         T is C + E + Y + S;
         T is C + E + Y
     ).
 
-% use with `label/1`
-make_row(Cols) :-
-    length(Cols, L), L #= 9,
-    Cols ins 1..9,
-    all_distinct(Cols).
+% create a row of unique numbers
+make_row(Length, Numbers) :-
+    length(Numbers, L), L #= Length,
+    % Numbers ins 1..Length,
+    ins(Numbers, 1..Length),
+    % between(1, Length, Numbers),
+    all_distinct(Numbers).
 
-make_matrix(Rows) :-
-    length(Rows, L), L #= 9,
-    maplist(make_row, Rows),
+% create a matrix of uniquely distributed rows
+make_matrix(Rows, Dimension) :-
+    length(Rows, L), L #= Dimension,
+    maplist(make_row(Dimension), Rows),
     transpose(Rows, Cols),
     maplist(all_distinct, Cols).
 
-make_routes(Routes, Costs, Delta) :-
-    make_matrix(Routes),
-    maplist(label, Routes),
+% find N combinations of stops where each route takes at most Delta time units longer than the fastest route
+make_routes(N, Routes, Costs, Delta) :-
+    make_matrix(Routes, N),
+    % maplist(legend, Routes),
     maplist(costs, Routes, Costs),
     max_list(Costs, Max),
     min_list(Costs, Min),
     Max #=< Min + Delta.
 
-% maplist(portray_clause, Routes).
+% NOTES
+% -----
+% maplist(portray_clause, Routes)
